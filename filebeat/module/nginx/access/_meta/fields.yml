@@ -1,3 +1,20 @@
+- name: uuid
+  type: keyword 
+  description: >
+    Unique UUID.
+- name: endpoint 
+  type: keyword 
+  description: >
+    endpoint.
+    endpoint.
+- name: realm 
+  type: keyword 
+  description: >
+    realm.
+- name: dn
+  type: keyword 
+  description: >
+    DN.
 - name: access
   type: group
   description: >

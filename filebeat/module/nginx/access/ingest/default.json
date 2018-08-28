@@ -4,7 +4,7 @@
     "grok": {
       "field": "message",
       "patterns":[
-        "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\""
+        "\"?%{IP_LIST:nginx.access.remote_ip_list} - %{DATA:nginx.access.user_name} \\[%{HTTPDATE:nginx.access.time}\\] \"%{GREEDYDATA:nginx.access.info}\" %{NUMBER:nginx.access.response_code} %{NUMBER:nginx.access.body_sent.bytes} \"%{DATA:nginx.access.referrer}\" \"%{DATA:nginx.access.agent}\" \"%{DATA:nginx.access.forwarded_for}\" \"%{DATA:uuid}\"" 
         ],
       "pattern_definitions": {
         "IP_LIST": "%{IP}(\"?,?\\s*%{IP})*"
@@ -23,6 +23,53 @@
   }, {
     "remove": {
       "field": "nginx.access.info"
+    }
+  }, {
+    "grok": {
+      "field": "nginx.access.url",
+      "patterns": [
+          "/%{DATA:endpoint}\\?%{GREEDYDATA:uri_query}"
+      ],
+      "ignore_missing": true
+    }
+  }, {
+      "kv": {
+          "field": "uri_query",
+          "field_split": "&",
+          "value_split": "=",
+	  "include_keys": ["realm", "dn"],
+          "target_field": "realm_kv",
+          "ignore_missing": true
+      }
+  }, {
+    "rename": {
+      "field": "realm_kv.realm",
+      "target_field": "realm",
+      "ignore_missing": true
+    }
+  }, {
+    "rename": {
+      "field": "realm_kv.dn",
+      "target_field": "dn",
+      "ignore_missing": true
+    }
+  }, {
+    "gsub": {
+      "field": "dn",
+      "pattern": "%3D",
+      "replacement": "=",
+      "ignore_missing": true
+    }
+  }, {
+    "gsub": {
+      "field": "dn",
+      "pattern": "%2C",
+      "replacement": ",",
+      "ignore_missing": true
+    }
+  }, {
+    "remove": {
+      "field": "realm_kv"
     }
   }, {
     "split": {
@@ -65,7 +112,7 @@
     }
   }, {
     "geoip": {
-      "field": "nginx.access.remote_ip",
+      "field": "nginx.access.forwarded_for",
       "target_field": "nginx.access.geoip"
     }
   }],
