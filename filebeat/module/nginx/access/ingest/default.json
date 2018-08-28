@@ -28,7 +28,7 @@
     "grok": {
       "field": "nginx.access.url",
       "patterns": [
-          "/%{DATA:endpoint}\\?%{GREEDYDATA:uri_query}"
+          "(/%{DATA:endpoint}\\?%{GREEDYDATA:uri_query}|/%{GREEDYDATA:endpoint})"
       ],
       "ignore_missing": true
     }
@@ -45,13 +45,15 @@
     "rename": {
       "field": "realm_kv.realm",
       "target_field": "realm",
-      "ignore_missing": true
+      "ignore_missing": true,
+      "ignore_failure": true
     }
   }, {
     "rename": {
       "field": "realm_kv.dn",
       "target_field": "dn",
-      "ignore_missing": true
+      "ignore_missing": true,
+      "ignore_failure": true
     }
   }, {
     "gsub": {
@@ -106,9 +108,8 @@
       "target_field": "nginx.access.user_agent"
     }
   }, {
-    "rename": {
-      "field": "nginx.access.agent",
-      "target_field": "nginx.access.user_agent.raw"
+    "remove": {
+      "field": "nginx.access.agent"
     }
   }, {
     "geoip": {
