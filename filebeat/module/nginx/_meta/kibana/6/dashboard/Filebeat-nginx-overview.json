@@ -167,7 +167,7 @@
                             "id": "2", 
                             "params": {
                                 "autoPrecision": true, 
-                                "field": "nginx.access.geoip.location"
+                                "field": "nginx.coordinates"
                             }, 
                             "schema": "segment", 
                             "type": "geohash_grid"

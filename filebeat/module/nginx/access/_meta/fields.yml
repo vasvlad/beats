@@ -15,6 +15,10 @@
   type: keyword 
   description: >
     DN.
+- name: coordinates 
+  type: geo_point 
+  description: >
+    Geo coordinates.
 - name: access
   type: group
   description: >
