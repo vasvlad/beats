@@ -56,6 +56,32 @@
       "ignore_failure": true
     }
   }, {
+    "set": {
+      "field": "lat",
+      "value": "0.0"
+    }
+  }, {
+    "set": {
+      "field": "lon",
+      "value": "0.0"
+    }
+  }, {
+    "convert": {
+      "field": "lat",
+      "type": "float",
+      "target_field": "lat",
+      "ignore_missing": true,
+      "ignore_failure": true
+    }
+  }, {
+    "convert": {
+      "field": "lon",
+      "type": "float",
+      "target_field": "lon",
+      "ignore_missing": true,
+      "ignore_failure": true
+    }
+  }, {
     "convert": {
       "field": "realm_kv.lat",
       "type": "float",
@@ -93,7 +119,7 @@
   }, {
     "script": {
       "lang": "painless",
-      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(item)) {       ctx.nginx.access.remote_ip = item;       found = true;       break;     }   }   if (!found) {     ctx.nginx.access.remote_ip = ctx.nginx.access.remote_ip_list[0];   } ctx.nginx.coordinates =  [ ctx.lon, ctx.lat ] "
+      "inline": "boolean isPrivate(def ip) { try { StringTokenizer tok = new StringTokenizer(ip, '.'); int firstByte = Integer.parseInt(tok.nextToken());       int secondByte = Integer.parseInt(tok.nextToken());       if (firstByte == 10) {         return true;       }       if (firstByte == 192 && secondByte == 168) {         return true;       }       if (firstByte == 172 && secondByte >= 16 && secondByte <= 31) {         return true;       }       if (firstByte == 127) {         return true;       }       return false;     } catch (Exception e) {       return false;     }   }   def found = false;   for (def item : ctx.nginx.access.remote_ip_list) {     if (!isPrivate(item)) {       ctx.nginx.access.remote_ip = item;       found = true;       break;     }   }   if (!found) {     ctx.nginx.access.remote_ip = ctx.nginx.access.remote_ip_list[0];   }  if (ctx.lon < 90 && ctx.lat < 90) { ctx.nginx.coordinates =  [ ctx.lon, ctx.lat ] } else { ctx.nginx.coordinates =  [ 0, 0 ] } "
       }
   }, {
     "remove":{
